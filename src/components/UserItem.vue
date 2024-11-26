@@ -25,7 +25,6 @@
     },
   };
   </script>
-  
   <style scoped>
   .user-item {
     padding: 10px;

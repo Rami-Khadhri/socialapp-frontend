@@ -199,7 +199,6 @@ export default {
       if (!username) return '';
       return username.split('_')[1]; // Extract the first name
     },
-
     // Handle file selection
     handlePhotoUpload(event) {
       const file = event.target.files[0];
