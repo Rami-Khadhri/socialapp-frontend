@@ -1,7 +1,10 @@
 <template>
+ 
+
   <div class="login-container">
     <div class="form-box">
       <!-- Logo/Header Section -->
+       
       <div class="header">
         <h2>Welcome Back</h2>
         <p class="subtitle">Please sign in to continue</p>
@@ -73,6 +76,7 @@
         <router-link to="/register">Sign up</router-link>
       </p>
     </div>
+
   </div>
 </template>
 

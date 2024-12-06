@@ -4,11 +4,29 @@
     <div v-if="user" class="profile-container">
       <div class="profile-card">
         <!-- User Photo -->
-        <div v-if="user" class="profile-photo">
-          <img v-if="user.isGoogleUser" :src="user.photoUrl"  alt="User Photo" class="user-photo" />
-          <img v-if="!user.isGoogleUser" :src=" user.photo" alt="User Photo" class="user-photo" />
     
+        <div class="profile-photo">
+          <img 
+            v-if="user.isGoogleUser" 
+            :src="user.photoUrl" 
+            alt="User Photo" 
+            class="user-photo" 
+          />
+          <img 
+            v-else-if="!user.isGoogleUser && user.photo" 
+            :src="user.photo" 
+            alt="User Photo" 
+            class="user-photo" 
+          />
+          <img 
+            v-else 
+            src="@/assets/user.png" 
+            alt="Default Photo" 
+            class="user-photo" 
+          />
         </div>
+     
+
         <div class="profile-username">
           <h3 class="lastname">{{ getLastName(user.username) }}</h3>
           <h3 class="firstname">{{ getFirstName(user.username) }}</h3>
@@ -18,15 +36,19 @@
         <p><strong>Role:</strong> {{ user.role }}</p>
         <p><strong>Account Status:</strong> {{ user.verified ? 'Verified' : 'Pending Verification' }}</p>
         <p><strong>Account Enabled:</strong> {{ user.enabled ? 'Active' : 'Inactive' }}</p>
-    <div v-if="user.isGoogleUser" class="google-user-banner" style="padding: 10px; padding-left: 50px;">
-      <img src="@/assets/google.png" alt="Google Logo" width="25px" height="25px"/>
-    <strong> Signed in with Google Account </strong>
-    </div>
-        <!-- Button to trigger Reset Password modal -->
-        <button v-if="!user.isGoogleUser" @click="showResetPasswordModal = true" class="reset-password-btn">Reset Password</button>
 
-        <!-- Upload Photo Section -->
-        <div class="upload-photo" v-if="!user.isGoogleUser">
+        <div v-if="user.isGoogleUser" class="google-user-banner">
+          <img src="@/assets/google.png" alt="Google Logo" width="25px" height="25px"/>
+          <strong>Signed in with Google Account</strong>
+        </div>
+
+        <!-- Button to trigger Reset Password modal (only for non-Google users) -->
+        <button v-if="!user.isGoogleUser" @click="showResetPasswordModal = true" class="reset-password-btn">
+          Reset Password
+        </button>
+
+        <!-- Upload Photo Section (only for non-Google users) -->
+        <div v-if="!user.isGoogleUser" class="upload-photo">
           <input type="file" accept="image/*" @change="handlePhotoUpload" />
           <button @click="uploadPhoto" class="upload-photo-btn">Upload Photo</button>
         </div>
@@ -35,7 +57,6 @@
       <!-- Logout Button -->
       <button @click="logout" class="logout-btn">Logout</button>
     </div>
-
     <!-- Reset Password Modal -->
     <div v-if="showResetPasswordModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
@@ -104,38 +125,64 @@ export default {
       // Redirect to login
       this.$router.push('/login');
     },
-
+    getUserPhoto(user) {
+  // Handle different photo sources for users
+  if (user.photo) {
+    // If it's base64 encoded image or binary data
+    if (user.photo.startsWith('data:image')) {
+      return user.photo;  // Return base64 encoded image as it is
+    } else {
+      // If it's binary data or URL (fallback), convert to base64 if needed
+      return `data:image/jpeg;base64,${user.photo}`;
+    }
+  }
+  return '/default-avatar.png';  // Fallback to default image if none is provided
+}
+,
     async fetchUserProfile() {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          this.$router.push('/login');
-          return;
-        }
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.$router.push('/login');
+      return;
+    }
 
-        const response = await axios.get('http://localhost:8081/api/auth/verify-token', {
+    const response = await axios.get('http://localhost:8081/api/auth/verify-token', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // For non-Google users, fetch photo separately
+    let photoData = null;
+    if (!response.data.googleUser) {
+      try {
+        const photoResponse = await axios.get('http://localhost:8081/api/users/photo', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        this.user = {
-          username: response.data.username,
-          email: response.data.email,
-          role: response.data.role,
-          verified: response.data.verified,
-          enabled: response.data.enabled,
-          photo: response.data.photo,
-          photoUrl: response.data.photoUrl,
-          isGoogleUser: response.data.googleUser,
-        };
-        console.log('API Response:', response.data);
-        console.log('Mapped User:', this.user);
-
+        photoData = photoResponse.data.photo ? `data:image/jpeg;base64,${photoResponse.data.photo}` : null;
       } catch (error) {
-        // Token invalid, redirect to login
-        this.logout();
+        console.error('Error fetching photo:', error);
       }
-    },
+    }
+
+    this.user = {
+      username: response.data.username,
+      email: response.data.email,
+      role: response.data.role,
+      verified: response.data.verified,
+      enabled: response.data.enabled,
+      photo: photoData,
+      photoUrl: response.data.photoUrl,
+      isGoogleUser: response.data.googleUser,
+    };
+  } catch (error) {
+    // Token invalid, redirect to login
+    this.logout();
+  }
+},
 
     closeModal() {
       this.showResetPasswordModal = false; // Close modal

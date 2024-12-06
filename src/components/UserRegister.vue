@@ -78,6 +78,17 @@
 import axios from 'axios';
 
 export default {
+  // Added route guard directly in the component
+  beforeRouteEnter(to, from, next) {
+    // Check if token exists
+    if (localStorage.getItem('token')) {
+      // Redirect to profile if logged in
+      next('/profile');
+    } else {
+      // Allow access to registration page
+      next();
+    }
+  },
   data() {
     return {
       username: '',

@@ -7,6 +7,8 @@ import UserLogin from './components/UserLogin.vue';
 import UserProfile from './components/UserProfile.vue';
 import UserRegister from './components/UserRegister.vue';
 import VerifyEmail from './components/VerifyEmail.vue';
+import Home from './components/Home.vue';
+
 
 const routes = [
   {
@@ -37,6 +39,12 @@ const routes = [
     props: true,
   },
   {
+    path: '/feed',
+    name: 'Feed',
+    component: Home,
+    meta: { requiresAuth: true }, // Ensure only logged-in users can access
+  },
+  {
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile,
@@ -46,6 +54,7 @@ const routes = [
     path: '/register',
     name: 'UserRegister',
     component: UserRegister,
+
   },
   {
     path: '/verify',
