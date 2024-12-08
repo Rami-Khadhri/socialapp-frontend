@@ -2,7 +2,8 @@
 module.exports = {
   content: [
     './Home.html',
-    './src/components/*.{vue,js,ts,jsx,tsx}', // Add paths to your Vue files here
+    './src/components/*.{vue,js,ts,jsx,tsx}', 
+    './src/*.{vue}'
   ],
   theme: {
     extend: {},

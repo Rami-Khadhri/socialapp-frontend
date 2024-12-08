@@ -53,6 +53,8 @@
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Verfication status</th>
+              <th>User type</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -67,7 +69,45 @@
 </td>
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
+              <td>{{ user.role  }}</td>
+              <td>
+        <span v-if="user.verified" class="verified">
+          Verified
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="green"
+            width="25"
+            height="25"
+            viewBox="0 0 24 24"
+          >
+            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+          </svg>
+        </span>
+        <span v-else class="not-verified">Not Verified</span>
+      </td>
+      <td>
+        <span v-if="user.googleUser">
+          <img
+            src="https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_42x16dp.png"
+            alt="Google Icon"
+            width="50"
+            height="50"
+          />
+        </span>
+        <span v-else>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="gray"
+            width="51"
+            height="50"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"
+            />
+          </svg>
+        </span>
+      </td>
               
               <td>
                 <button @click="openEditModal(user)" class="edit-btn">Edit</button>
@@ -846,4 +886,14 @@ td {
   font-size: 0.8em;
   margin-top: 5px;
 }
+
+.verified {
+  display: flex;
+  align-items: center;
+  color: green;
+}
+.not-verified {
+  color: red;
+}
 </style>
+

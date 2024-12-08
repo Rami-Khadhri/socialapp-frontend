@@ -1,26 +1,81 @@
 <template>
-    <div class="min-h-screen bg-gray-100 flex">
-    <!-- Top Navbar -->
-        <!-- Search Bar -->
-        <!-- Left Sidebar -->
-        <div class="w-64 bg-white shadow-md p-4 hidden md:block">
-      <h2 class="text-xl font-bold mb-6 text-gray-800">Menu</h2>
-      <nav class="space-y-2">
-        <div 
-          v-for="(item, index) in menuItems" 
-          :key="index"
-          class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-          :class="{'bg-blue-100 text-blue-600': item.active}"
-        >
-          <component 
-            :is="item.icon" 
-            class="w-6 h-6"
-            :class="item.active ? 'text-blue-600' : 'text-gray-500'"
-          />
-          <span class="text-gray-800 font-medium">{{ item.label }}</span>
+  
+  <div class="min-h-screen bg-gray-100 flex">
+  <!-- Left Sidebar Navigation -->
+  <div class="w-72 bg-white shadow-lg h-screen overflow-y-auto p-6 hidden md:block">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        SocialHub
+      </h1>
+      
+      <nav class="space-y-4">
+        <!-- Pages Section -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-gray-600">Pages</h3>
+          <div class="space-y-2">
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l5-5 5 5" />
+              </svg>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">Home</span>
+            </div>
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12l2 2 4-4M12 12l2 2 4-4M12 12l2 2 4-4M12 12l2 2 4-4" />
+              </svg>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">My Groups</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages Section -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-gray-600">Messages</h3>
+          <div class="space-y-2">
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4h16M4 8h16M4 12h16M4 16h16" />
+              </svg>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">Inbox</span>
+            </div>
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12c0 1.104-.896 2-2 2h-6V9h6c1.104 0 2 .896 2 2zM3 12c0-1.104.896-2 2-2h6v5H5c-1.104 0-2-.896-2-2z" />
+              </svg>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">Chats</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Groups Section -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-gray-600">Groups</h3>
+          <div class="space-y-2">
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <span class="text-xl">👥</span>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">Family</span>
+            </div>
+            <div class="flex items-center space-x-4 px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer group">
+              <span class="text-xl">🎮</span>
+              <span class="text-gray-800 font-medium group-hover:text-blue-600">Gaming</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Create New Group Button -->
+        <div class="mt-4">
+          <button class="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <span class="text-sm font-semibold">+ Create New Group</span>
+          </button>
         </div>
       </nav>
     </div>
+  </div>
+
+
     <div class="container mx-auto max-w-xl md:max-w-2xl lg:max-w-3xl px-4 py-6">
       <!-- Sticky Create Post Section -->
       <div 
@@ -33,7 +88,7 @@
             :src="currentUser.photoUrl || currentUser.photo || '/default-avatar.png'" 
             alt="Profile Picture" 
             class="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500/30">
-
+            
         <div class="flex-grow">
          
             <textarea 
@@ -49,6 +104,7 @@
               v-if="showPostOptions" 
               class="mt-4 space-y-4 md:space-y-0 md:flex md:justify-between md:items-center"
             >
+            
               <!-- Media Upload Options -->
               <div class="flex space-x-4">
                 <input 
@@ -68,15 +124,105 @@
                   Photo/Video
                 </button>
                 
-                <button 
-                  class="flex items-center text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Tag Friends
-                </button>
+
+  <!-- Tag Friends Button -->
+  <button 
+  @click="openUserTagModal" 
+  class="flex items-center text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors w-1/2"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+  Tag Friends
+</button>
+
+  
+</div>
+
+<!-- Tagged Users Display -->
+<div v-if="taggedUsers.length > 0" class="mt-2 flex space-x-2">
+  <span 
+    v-for="user in taggedUsers" 
+    :key="user.username" 
+    class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center"
+  >
+    @{{ user.username }}
+    <button 
+      @click="toggleUserTag(user)" 
+      class="ml-1 text-blue-500 hover:text-blue-700"
+    >
+      ×
+    </button>
+  </span>
+</div>
+ <!-- Category Dropdown -->
+ <div class="relative w-1/2">
+    <span> Category : </span>
+  <select 
+    v-model="selectedCategory"
+    class="w-30 px-2 py-1 bg-white text-gray-700 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm shadow-sm hover:border-gray-400"
+  >
+    <option value="" disabled>Select Category</option>
+    <option 
+      v-for="category in categories" 
+      :key="category" 
+      :value="category"
+      class="bg-white text-gray-700 hover:bg-blue-100"
+    >
+      {{ category }}
+    </option>
+  </select>
+
+<!-- User Tag Modal -->
+<div 
+  v-if="showUserTagModal" 
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white rounded-lg p-6 max-w-md w-full">
+    <h3 class="text-lg font-semibold mb-4">Tag Friends</h3>
+    <div class="space-y-2 max-h-64 overflow-y-auto">
+      <div 
+        v-for="user in availableUsers" 
+        :key="user.username"
+        @click="toggleUserTag(user)"
+        class="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
+        :class="{'bg-blue-50': taggedUsers.some((u) => u.username === user.username)}"
+      >
+        <img 
+          :src="getUserPhoto(user)" 
+          class="w-10 h-10 rounded-full mr-3 object-cover"
+        />
+        <span class="flex-grow">{{ user.username }}</span>
+        <svg 
+          v-if="taggedUsers.some((u) => u.username === user.username)"
+          xmlns="http://www.w3.org/2000/svg" 
+          class="h-6 w-6 text-blue-500" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    </div>
+    <div class="mt-4 flex justify-end space-x-2">
+      <button 
+        @click="showUserTagModal = false" 
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg"
+      >
+        Cancel
+      </button>
+      <button 
+        @click="showUserTagModal = false" 
+        class="px-4 py-2 bg-blue-500 text-white rounded-lg"
+      >
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
               </div>
               <button
       v-if="isEditingPost"
@@ -142,23 +288,39 @@
               :src="post.user.photoUrl || post.user.photo || require('@/assets/user.png')"
               class="w-10 h-10 rounded-full mr-3 object-cover ring-2 ring-blue-500/30"/>
               <div>
-                <h3 class="font-semibold text-gray-800"> {{ formatUsername(post.user) }}</h3>
+                <h3 class="font-semibold text-gray-800"> {{ formatUsername(post.user) }}  </h3> 
+                
                 <p class="text-xs text-gray-500">
                   {{ formatPostTime(post.createdAt) }}
                 </p>
+              </div>
+              <div v-if="post.taggedUsers && post.taggedUsers.length > 0" class="text-xs text-gray-500 mb-2">
+                Tagged: 
+                <span 
+                  v-for="user in post.taggedUsers" 
+                  :key="user.username" 
+                  class="text-blue-600 mr-2"
+                >
+                  @{{ user.username }}
+                </span>
+              </div>
+                <div v-if="post.category" class="text-xs text-gray-500 mb-2 pl-10">
+                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                {{ post.category }}
+              </span>
               </div>
               <button 
                 @click="openPostOptions(post)" 
                 class="ml-auto text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors"
               >
-            
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
+              
               <div 
-  v-if="showPostOptionsModal && editingPost" 
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+  v-if=" currentUser.username == post.user.username &&showPostOptionsModal && editingPost" 
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10"
 > 
   <div class="bg-white rounded-lg p-6 max-w-sm w-full">
     <h3 class="text-lg font-semibold mb-4">Post Options</h3>
@@ -185,11 +347,13 @@
   </div>
 </div>
             </div>
-
+              
             <!-- Post Content -->
             <div class="p-4">
-              <p class="text-gray-800 mb-3 leading-relaxed text-left">{{ post.content }}</p>
-             
+              <p 
+  class="text-gray-800 mb-3 leading-relaxed text-left"
+  v-html="highlightHashtags(post.content)"
+></p>
               <img 
   v-if="post.imageUrl" 
   :src="post.imageUrl" 
@@ -314,7 +478,6 @@
       />
     </div>
   </div>
-  
 </template>
 <script>import axios from 'axios';
 export default {
@@ -336,6 +499,20 @@ export default {
       noMorePosts: false,
       expandedCommentsPosts: [],
       commentInputs: {},
+      categories: [
+        'Sports', 
+        'Music', 
+        'Study', 
+        'Fun', 
+        'Technology', 
+        'Food', 
+        'Travel', 
+        'Fitness'
+      ],
+      selectedCategory: null,
+      availableUsers: [],
+      taggedUsers: [],
+      showUserTagModal: false,
 
       postOptionsModal: null,
       backendUrl: process.env.VUE_APP_BACKEND_URL,
@@ -343,6 +520,17 @@ export default {
   },
   mounted() {
     this.initializePage();
+  },
+  computed: {
+    // Computed property to highlight hashtags
+    highlightHashtags() {
+      return (text) => {
+        const regex = /#(\w+)/g;
+        return text.replace(regex, (match) => {
+          return `<span class="text-blue-600 font-bold">${match}</span>`;
+        });
+      };
+    },
   },
   methods: {
     async initializePage() {
@@ -355,6 +543,39 @@ export default {
         this.logout();
       }
     },
+    async fetchAvailableUsers() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${this.backendUrl}/api/users/all`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Filter out the current user
+    this.availableUsers = response.data.filter(
+      (user) => user.username !== this.currentUser.username
+    );
+
+    console.log('Available users:', this.availableUsers); // Debugging log
+  } catch (error) {
+    console.error('Error fetching available users:', error);
+  }
+},
+openUserTagModal() {
+    this.fetchAvailableUsers(); // Fetch users dynamically
+    this.showUserTagModal = true; // Show the modal
+  },
+  toggleUserTag(user) {
+  const index = this.taggedUsers.findIndex((u) => u.username === user.username);
+  if (index > -1) {
+    // Remove the user if already tagged
+    this.taggedUsers.splice(index, 1);
+  } else {
+    // Add the user if not tagged
+    this.taggedUsers.push(user);
+  }
+  console.log('Tagged users:', this.taggedUsers); // Debugging log
+},
+
     async fetchCurrentUser() {
       try {
         const token = localStorage.getItem('token');
@@ -707,47 +928,67 @@ async confirmEditPost() {
 
 
     async createPost() {
-      
+  try {
+    // Fetch all users and populate taggedUsers except currentUser
+    await this.fetchAvailableUsers();
+    
+    const formData = new FormData();
+    formData.append('content', this.newPostContent);
 
-      try {
-        const formData = new FormData();
-        formData.append('content', this.newPostContent);
+    // Add tagged users
+    if (this.taggedUsers.length > 0) {
+      formData.append(
+        'taggedUsers',
+        JSON.stringify(this.taggedUsers.map((user) => user.username))
+      );
+    }
 
-        if (this.selectedImageFile) {
-          formData.append('image', this.selectedImageFile);
-        }
+    // Add category if selected
+    if (this.selectedCategory) {
+      formData.append('category', this.selectedCategory);
+      console.log(this.selectedCategory);
+    }
 
-        const response = await axios.post('http://localhost:8081/api/posts/create', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+    // Add image if selected
+    if (this.selectedImageFile) {
+      formData.append('image', this.selectedImageFile);
+    }
 
-        const newPost = {
-          ...response.data,
-          user: {
-            ...this.currentUser,
-            photoUrl: this.getUserPhoto(this.currentUser)
-          },
-          liked: false,
-          likeCount: 0,
-          commentCount: 0,
-          shareCount: 0
-        };
+    const response = await axios.post(`${this.backendUrl}/api/posts/create`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
 
-        this.posts.unshift(newPost);
-        this.newPostContent = '';
-        this.showPostOptions = false;
-        this.clearImageUpload();
-        this.fetchPosts();
+    // Add new post to posts list
+    const newPost = {
+      ...response.data,
+      user: {
+        ...this.currentUser,
+        photoUrl: this.getUserPhoto(this.currentUser),
+      },
+      taggedUsers: this.taggedUsers,
+      liked: false,
+      likeCount: 0,
+      commentCount: 0,
+      shareCount: 0,
+      category:this.selectedCategory
 
-      } catch (error) {
-        console.error('Error creating post:', error);
-        // Optionally show a user-friendly error message
-      }
-    },
+    };
 
+    this.posts.unshift(newPost);
+
+    // Reset form state
+    this.newPostContent = '';
+    this.selectedCategory = null;
+    this.taggedUsers = [];
+    this.showPostOptions = false;
+    this.clearImageUpload();
+  } catch (error) {
+    console.error('Error creating post:', error);
+  }
+},
     redirectToLogin() {
       this.$router.push('/login');
     },
@@ -813,7 +1054,7 @@ async confirmEditPost() {
 
 /* Hover effects */
 .post-item {
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
 .post-item:hover {
   transform: translateY(-5px);
@@ -826,5 +1067,12 @@ async confirmEditPost() {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
+}
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.font-bold {
+  font-weight: 700;
 }
 </style>
