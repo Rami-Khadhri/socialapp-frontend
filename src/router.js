@@ -8,6 +8,7 @@ import UserProfile from './components/UserProfile.vue';
 import UserRegister from './components/UserRegister.vue';
 import VerifyEmail from './components/VerifyEmail.vue';
 import Home from './components/Home.vue';
+import ProfilePage from './components/ProfilePage.vue';
 
 
 const routes = [
@@ -49,6 +50,11 @@ const routes = [
     name: 'UserProfile',
     component: UserProfile,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/profilepage',
+    name: 'ProfilePage',
+    component: ProfilePage,
   },
   {
     path: '/register',

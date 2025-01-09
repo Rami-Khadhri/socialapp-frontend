@@ -49,6 +49,7 @@
           <template v-else>
             <router-link to="/login" class="nav-link">Login</router-link>
             <router-link to="/register" class="signup-btn">Signup</router-link>
+            <router-link to="/profilepage" class="signup-btn">profilepage</router-link>
           </template>
         </div>
       </div>
