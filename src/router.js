@@ -9,6 +9,8 @@ import UserRegister from './components/UserRegister.vue';
 import VerifyEmail from './components/VerifyEmail.vue';
 import Home from './components/Home.vue';
 import ProfilePage from './components/ProfilePage.vue';
+import AI_Assistant from './components/AI_Assistant.vue';
+import AveragePostsChart from './components/AveragePostsChart.vue';
 
 
 const routes = [
@@ -52,10 +54,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/profilepage',
+    path: '/profilepage/:id',
     name: 'ProfilePage',
     component: ProfilePage,
   },
+  
   {
     path: '/register',
     name: 'UserRegister',
@@ -66,6 +69,19 @@ const routes = [
     path: '/verify',
     component: VerifyEmail
   },
+  {
+    path: '/chat',
+    name: 'AI_Assistant',
+    component: AI_Assistant,
+    meta: { requiresAuth: true }, // Ensure only logged-in users can access
+  },
+  {
+    path: '/chart',
+    name: 'AveragePostsChart',
+    component: AveragePostsChart,
+    meta: { requiresAuth: true }, // Ensure only logged-in users can access
+  },
+
 ];
 
 const router = createRouter({

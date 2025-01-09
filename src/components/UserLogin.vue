@@ -1,13 +1,14 @@
 <template>
- 
 
   <div class="login-container">
+
     <div class="form-box">
       <!-- Logo/Header Section -->
-       
       <div class="header">
+        <img :src="require('@/assets/trendy_logo.png')" alt="Trendy Logo" class="logo-img top-left-logo"/>
         <h2>Welcome Back</h2>
         <p class="subtitle">Please sign in to continue</p>
+
       </div>
 
       <form @submit.prevent="handleLogin">
@@ -76,7 +77,6 @@
         <router-link to="/register">Sign up</router-link>
       </p>
     </div>
-
   </div>
 </template>
 
@@ -99,12 +99,14 @@ export default {
           username: this.username,
           password: this.password
         });
-
+ 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', response.data.username);
         localStorage.setItem('role', response.data.role);
+        localStorage.setItem('userId', response.data.id);
+        this.$router.push('/feed');
+        window.location.reload();
 
-        this.$router.push('/profile');
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
       }
@@ -114,12 +116,13 @@ export default {
         const googleResponse = await axios.post('http://localhost:8081/api/auth/google', {
           credential: response.credential
         });
-
         localStorage.setItem('token', googleResponse.data.token);
         localStorage.setItem('username', googleResponse.data.username);
         localStorage.setItem('role', googleResponse.data.role);
+        localStorage.setItem('userId', googleResponse.data.id);
 
-        this.$router.push('/profile');
+        this.$router.push('/feed');
+        window.location.reload();
       } catch (error) {
         this.errorMessage = error.response?.data?.error || 'Google login failed';
         console.error('Google login error:', error);
@@ -128,7 +131,7 @@ export default {
   },
   mounted() {
     if (localStorage.getItem('token')) {
-      this.$router.push('/profile');
+      this.$router.push('/feed');
     }
 
     const script = document.createElement('script');
@@ -144,12 +147,11 @@ export default {
 
 <style scoped>
 .login-container {
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
+  position: relative; /* For positioning logos */
 }
 
 .form-box {
@@ -223,7 +225,7 @@ input:focus {
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: single-background 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -283,4 +285,15 @@ input:focus {
     padding: 24px;
   }
 }
+
+
+.top-left-logo {
+  display: flex;
+  justify-content: center;
+  width: 90px;
+  height: 89px;
+margin-left: 115px;
+margin-bottom: 20px;
+}
+
 </style>

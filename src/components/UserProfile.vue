@@ -124,6 +124,7 @@ export default {
       
       // Redirect to login
       this.$router.push('/login');
+      window.location.reload();
     },
     getUserPhoto(user) {
   // Handle different photo sources for users

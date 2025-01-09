@@ -1,216 +1,268 @@
 <template>
-  <div class="dashboard-container">
-    <!-- Top Navigation Bar -->
-    <header class="top-nav">
-      <h1>Admin Dashboard</h1>
-      <div class="nav-right">
-        <div class="search-bar">
-          <input
-            type="text"
-            placeholder="Search users..."
-            v-model="searchQuery"
-            @input="filterUsers"
-          />
-          <i class="fas fa-search"></i>
+  <!-- Delete Confirmation Modal -->
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+    <div class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-semibold text-gray-900">Confirm Delete</h3>
+        <button @click="onCancel" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="mt-4">
+        <p class="text-sm text-gray-500">Are you sure you want to delete this user? This action cannot be undone.</p>
+      </div>
+      <div class="mt-6 flex justify-end space-x-4">
+        <button @click="onCancel" class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
+          Cancel
+        </button>
+        <button @click="onConfirm" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="fixed right-4 top-4 z-50 flex flex-col gap-2">
+    <div v-for="toast in toasts" :key="toast.id"
+      :class="[
+        'min-w-[300px] transform rounded-lg p-4 shadow-lg transition-all duration-300',
+        toast.type === 'success' ? 'bg-emerald-500' : 'bg-red-500',
+        'animate-slideIn'
+      ]">
+      <div class="flex items-center justify-between text-white">
+        <div class="flex items-center space-x-2">
+          <svg v-if="toast.type === 'success'" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <svg v-else class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+          <span class="font-medium">{{ toast.message }}</span>
         </div>
-        <div class="user-menu">
-          <img
-            :src="currentUser.photo || '/default-avatar.png'"
-            alt="Admin"
-            class="user-avatar"
-          />
-          <span>{{ currentUser.username }}</span>
-          <button @click="logout" class="logout-btn">Logout</button>
+        <button @click="removeToast(toast.id)" class="ml-4 text-white hover:text-gray-100">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard -->
+  <div class="min-h-screen bg-gray-50">
+    <!-- Top Navigation -->
+    <header class="bg-white shadow">
+      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <router-link to="/chart" class="button-chart">Chart of Posts Monthly</router-link>
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input type="text" v-model="searchQuery" @input="filterUsers"
+              class="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 leading-5 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+              placeholder="Search users..." />
+          </div>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <!-- Stats Overview -->
-      <section class="stats-overview">
-        <div class="stat-card" v-for="stat in stats" :key="stat.title">
-          <i :class="stat.icon" class="stat-icon"></i>
-          <div>
-            <h3>{{ stat.title }}</h3>
-            <p>{{ stat.value }}</p>
+      <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div v-for="stat in stats" :key="stat.title"
+          class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <i :class="stat.icon" class="h-6 w-6 text-gray-400"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dt class="truncate text-sm font-medium text-gray-500">{{ stat.title }}</dt>
+              <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stat.value }}</dd>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- Users Management Table -->
-      <section class="users-table">
-        <div class="table-header">
-          <h2>All Users</h2>
-          <button @click="fetchStats" class="refresh-btn">
-            Refresh Data
+      <!-- Users Table -->
+      <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="px-4 py-5 sm:px-6">
+          <h2 class="text-lg font-medium text-gray-900">Users Management</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Photo</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Username</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Role</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <tr v-for="user in filteredUsers" :key="user.id" class="hover:bg-gray-50">
+                <td class="whitespace-nowrap px-6 py-4">
+                  <img :src="user.photoUrl || (user.photo ? `data:image/jpeg;base64,${user.photo}` : '/default-avatar.png')"
+                    class="h-10 w-10 rounded-full object-cover" alt="User avatar" />
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ user.username }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ user.email }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <span :class="[
+                    'inline-flex rounded-full px-2 text-xs font-semibold leading-5',
+                    user.role === 'ROLE_ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
+                  ]">
+                    {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}
+                  </span>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <span v-if="user.verified" class="inline-flex items-center text-green-600">
+                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    Verified
+                  </span>
+                  <span v-else class="inline-flex items-center text-gray-500">
+                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    Not Verified
+                  </span>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <span v-if="user.googleUser" class="inline-flex items-center">
+  <svg class="mr-2" width="20px" height="20px" viewBox="-3 0 262 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+    <path d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" fill="#4285F4"/>
+    <path d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1" fill="#34A853"/>
+    <path d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782" fill="#FBBC05"/>
+    <path d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251" fill="#EB4335"/>
+  </svg>
+  <span>Google</span>
+</span>
+                  <span v-else class="inline-flex items-center text-gray-600">
+                    <svg width="22px" height="22px" class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                    Standard
+                  </span>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  <button @click="openEditModal(user)"
+                    class="mr-2 inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100">
+                    Edit
+                  </button>
+                  <button @click="confirmDeleteUser(user.id)"
+                    class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="!filteredUsers.length" class="px-6 py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No users found</h3>
+            <p class="mt-1 text-sm text-gray-500">Try adjusting your search query.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- Edit Modal -->
+  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+    <div class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-semibold text-gray-900">Edit User</h3>
+  <button @click="closeEditModal" class="text-gray-400 hover:text-gray-500">
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+      </div>
+
+      <form @submit.prevent="saveUserEdit" class="mt-6 space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Username</label>
+          <input type="text" v-model.trim="editingUser.username" @input="validateUsername"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
+          <p v-if="validationErrors.username" class="mt-1 text-sm text-red-600">{{ validationErrors.username }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" v-model.trim="editingUser.email" @input="validateEmail"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
+          <p v-if="validationErrors.email" class="mt-1 text-sm text-red-600">{{ validationErrors.email }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Role</label>
+          <select v-model="editingUser.role"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm">
+            <option value="ROLE_USER">User</option>
+            <option value="ROLE_ADMIN">Admin</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-medium text-gray-700">Account Status</label>
+            <button type="button" @click="editingUser.enabled = !editingUser.enabled"
+              :class="[
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
+                editingUser.enabled ? 'bg-blue-600' : 'bg-gray-200'
+              ]">
+              <span
+                :class="[
+                  'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  editingUser.enabled ? 'translate-x-5' : 'translate-x-0'
+                ]" />
+            </button>
+          </div>
+          <p class="mt-1 text-sm text-gray-500">{{ editingUser.enabled ? 'Account is active' : 'Account is inactive' }}</p>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-medium text-gray-700">Verification Status</label>
+            <button type="button" @click="editingUser.verified = !editingUser.verified"
+              :class="[
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
+                editingUser.verified ? 'bg-blue-600' : 'bg-gray-200'
+              ]">
+              <span
+                :class="[
+                  'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  editingUser.verified ? 'translate-x-5' : 'translate-x-0'
+                ]" />
+            </button>
+          </div>
+          <p class="mt-1 text-sm text-gray-500">{{ editingUser.verified ? 'User is verified' : 'User is not verified' }}</p>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-4">
+          <button type="button" @click="closeEditModal"
+            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Cancel
+          </button>
+          <button type="submit" :disabled="!isFormValid"
+            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+            Save Changes
           </button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Photo</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Verfication status</th>
-              <th>User type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in filteredUsers" :key="user.id">
-              <td>
-  <img 
-    :src="user.photoUrl || (user.photo ? `data:image/jpeg;base64,${user.photo}` : '/default-avatar.png')" 
-    alt="users-photo" 
-    class="user-avatar" 
-  />
-</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.role  }}</td>
-              <td>
-        <span v-if="user.verified" class="verified">
-          Verified
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="green"
-            width="25"
-            height="25"
-            viewBox="0 0 24 24"
-          >
-            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
-          </svg>
-        </span>
-        <span v-else class="not-verified">Not Verified</span>
-      </td>
-      <td>
-        <span v-if="user.googleUser">
-          <img
-            src="https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_42x16dp.png"
-            alt="Google Icon"
-            width="50"
-            height="50"
-          />
-        </span>
-        <span v-else>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="gray"
-            width="51"
-            height="50"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"
-            />
-          </svg>
-        </span>
-      </td>
-              
-              <td>
-                <button @click="openEditModal(user)" class="edit-btn">Edit</button>
-                <button @click="confirmDeleteUser(user.id)" class="delete-btn">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-if="!filteredUsers.length" class="no-data">
-          No users found.
-        </p>
-      </section>
-    </main>
-    
-    <!-- Edit User Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
-      <div class="edit-modal">
-        <h2>Edit User</h2>
-        <form @submit.prevent="saveUserEdit">
-          <div class="form-group">
-            <label>Username</label>
-            <input 
-              v-model.trim="editingUser.username" 
-              type="text" 
-              required 
-              @input="validateUsername"
-            />
-            <span v-if="validationErrors.username" class="error-message">
-              {{ validationErrors.username }}
-            </span>
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input 
-              v-model.trim="editingUser.email" 
-              type="email" 
-              required 
-              @input="validateEmail"
-            />
-            <span v-if="validationErrors.email" class="error-message">
-              {{ validationErrors.email }}
-            </span>
-          </div>
-
-          <div class="form-group">
-            <label>Role</label>
-            <select v-model="editingUser.role" required>
-              <option value="ROLE_USER">User</option>
-              <option value="ROLE_ADMIN">Admin</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Account Status</label>
-            <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                v-model="editingUser.enabled" 
-                id="account-status"
-              />
-              <label for="account-status">
-                {{ editingUser.enabled ? 'Active' : 'Inactive' }}
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Verification Status</label>
-            <div class="toggle-switch">
-              <input 
-                type="checkbox" 
-                v-model="editingUser.verified" 
-                id="verification-status"
-              />
-              <label for="verification-status">
-                {{ editingUser.verified ? 'Verified' : 'Unverified' }}
-              </label>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <button 
-              type="submit" 
-              class="save-btn"
-              :disabled="!isFormValid"
-            >
-              Save Changes
-            </button>
-            <button 
-              type="button" 
-              class="cancel-btn" 
-              @click="closeEditModal"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
   </div>
+  
 </template>
 
 <script>
@@ -223,6 +275,7 @@ export default {
         { title: "Total Users", value: 0, icon: "fas fa-users" },
         { title: "New Users", value: 0, icon: "fas fa-user-plus" }
       ],
+      toasts: [],
       users: [],
       filteredUsers: [],
       searchQuery: "",
@@ -255,6 +308,38 @@ export default {
     }
   },
   methods: {
+
+    addToast(message, type) {
+      const id = Date.now();
+      this.toasts.push({ id, message, type });
+
+      // Remove the toast after 3 seconds
+      setTimeout(() => this.removeToast(id), 3000);
+    },
+    // Remove a toast by its ID
+    removeToast(id) {
+      this.toasts = this.toasts.filter(toast => toast.id !== id);
+    },
+    // Success toast
+    successToast(message) {
+      this.addToast(message, 'success');
+    },
+    // Error toast
+    errorToast(message) {
+      this.addToast(message, 'error');
+    },
+     // Confirmation for deleting a user
+     confirmDeleteUser(userId) {
+      this.$dialog.confirm({
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to delete this user?',
+        onConfirm: () => this.deleteUser(userId),
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel',
+        confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
+        cancelButtonClass: 'bg-gray-300 hover:bg-gray-400 text-black'
+      });
+    },
     validateUsername() {
       const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
       if (!usernameRegex.test(this.editingUser.username)) {
@@ -490,13 +575,6 @@ async fetchStats() {
         }
       }
     },
-    confirmDeleteUser(userId) {
-      this.$dialog.confirm({
-        title: 'Confirm Delete',
-        message: 'Are you sure you want to delete this user?',
-        onConfirm: () => this.deleteUser(userId)
-      });
-    },
     async deleteUser(userId) {
       try {
         const token = localStorage.getItem('token');
@@ -511,7 +589,8 @@ async fetchStats() {
         this.users = this.users.filter(user => user.id !== userId);
         this.filterUsers(); // Re-apply any active search filter
         
-        this.$toast.success('User deleted successfully');
+        // Show success toast
+        this.successToast('User deleted successfully');
       } catch (error) {
         console.error('Error deleting user:', error);
         
@@ -522,16 +601,16 @@ async fetchStats() {
           
           switch (status) {
             case 403:
-              this.$toast.error('You do not have permission to delete this user.');
+              this.errorToast('You do not have permission to delete this user.');
               break;
             case 404:
-              this.$toast.error('User not found.');
+              this.errorToast('User not found.');
               break;
             default:
-              this.$toast.error(message);
+              this.errorToast(message);
           }
         } else {
-          this.$toast.error('Network error. Please try again.');
+          this.errorToast('Network error. Please try again.');
         }
       }
     }
@@ -539,27 +618,28 @@ async fetchStats() {
   async mounted() {
     // Install recommended plugins for toast and dialog
     this.$toast = {
-      success: (msg) => alert(msg), // Placeholder, replace with actual toast library
-      error: (msg) => alert(msg)
+      success: (msg) => this.successToast(msg),
+      error: (msg) => this.errorToast(msg)
     };
+
     this.$dialog = {
-      confirm: ({ message, onConfirm }) => {
-        if (window.confirm(message)) {
+      confirm: ({ message, onConfirm, title }) => {
+        if (window.confirm(`${title}\n\n${message}`)) {
           onConfirm();
         }
       }
     };
-
     await this.fetchCurrentUserProfile();
     this.fetchStats();
   }
+  
 };
 </script>
 
 <style>
 /* General styles */
 body {
-  margin: 0;
+
   font-family: Arial, sans-serif;
 }
 
@@ -570,6 +650,7 @@ body {
   align-items: center;
   background-color: #0078d7;
   color: white;
+  border-radius: 10px;
   padding: 15px 20px;
 }
 
@@ -894,6 +975,79 @@ td {
 }
 .not-verified {
   color: red;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-in-out;
+}
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.button-chart {
+  position: absolute;
+  top: 200px;
+  right: 25px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(45deg, #6a11cb, #2575fc); /* Gradient background */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none; /* Remove underline */
+  text-align: center;
+  display: inline-block;
+}
+
+.button-chart:hover {
+  background: linear-gradient(45deg, #2575fc, #6a11cb); /* Reverse gradient on hover */
+  transform: scale(1.1); /* Slightly increase the size */
+}
+
+.button-chart:active {
+  transform: scale(0.95); /* Slightly shrink on click */
+}
+
+.button-chart {
+  animation: color-change 3s infinite alternate; /* Color-changing animation */
+}
+
+/* Keyframes for color change animation */
+@keyframes color-change {
+  0% {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+  }
+  50% {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Soft orange gradient */
+  }
+  100% {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+  }
 }
 </style>
 
